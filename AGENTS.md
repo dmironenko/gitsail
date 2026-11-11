@@ -1,12 +1,13 @@
-# Composer
+# GitSail
 
-Check Git status before editing and preserve the user's work. Write all
-documentation, comments, and CLI help in English.
+Check Git status before editing and preserve the user's work. Write Go code
+comments and CLI help in English. User-facing documentation must be available
+in English and Russian; keep both language trees aligned.
 
 ## Design
 
 Keep the flow small: Git snapshots, vars/templates, networks, Compose SDK.
-Composer knows `apps/<namespace>/<name>` and environments, not application types.
+GitSail knows `apps/<namespace>/<name>` and environments, not application types.
 Describe nginx, proxies, databases, and routing in GitOps. Do not add app-specific
 Go branches, a container controller, a state machine, framework layers, or
 validation that duplicates Compose. Reduce responsibilities, not readability.
@@ -43,13 +44,13 @@ make focused changes, and use existing tests. Add abstractions only for real nee
   environment variables with their original names under `app.env` and render
   an env file referenced by `compose.services.<service>.env_file`.
   The built-in Compose template must not read `app`. Put Docker settings in
-  `compose` and Composer options, including `enabled`, in `compose.x-composer`.
+  `compose` and GitSail options, including `enabled`, in `compose.x-gitsail`.
 - Decrypt `ENC[...]` values anywhere in vars with age before merging vars.
   Keep `age_key_file` outside Git and plaintext out of reports. Use only Go templates; disable Compose interpolation
   so `$` in secrets survives.
 - A failed apply must not leave a success hash that hides a later Git revert.
 - Do not automatically delete volumes/images. Treat the GitOps repository as trusted.
-- Docker owns images and build cache; do not add a Composer cache manager.
+- Docker owns images and build cache; do not add a GitSail cache manager.
 - Build identity is repository + tag (SHA, tag, or branch) + rendered Dockerfile.
   Finish building before invalidating the applied marker or calling Up; failed
   builds preserve the running project.
@@ -57,13 +58,13 @@ make focused changes, and use existing tests. Add abstractions only for real nee
   into it; the CLI passes an empty build context and no build args.
 - `source.auth` applies only to GitOps; credentials are not forwarded to builds.
   Use embedded BuildKit and verify builds with adapter integration tests.
-- Composer fetches, validates, and applies changes itself; GitHub Actions is optional.
+- GitSail fetches, validates, and applies changes itself; GitHub Actions is optional.
 - `init` creates an empty structure. Demo apps belong in fixtures or
-  [composer-example](https://github.com/dmironenko/composer-example).
+  [gitsail-example](https://github.com/dmironenko/gitsail-example).
 
 ## Package boundaries
 
-Within `internal/app/composer`:
+Within `internal/app/gitsail`:
 
 - `domain`: models, values, and pure rules. Standard library only; no I/O, SDKs,
   or serialization tags.
@@ -72,7 +73,7 @@ Within `internal/app/composer`:
 - `ports/cli`: commands, flags, and JSON DTOs. Does not construct external clients.
 - `adapters/{git,gitops,docker,state,systemd}`: technical implementations. Adapters
   cannot import sibling adapters or inbound ports.
-- `cmd/composer`: the composition root, host YAML, bootstrap, process lock,
+- `cmd/gitsail`: the composition root, host YAML, bootstrap, process lock,
   constructors, and cleanup. Polling/retry policy belongs to reconcile.
 
 Compose SDK models stay inside GitOps/Docker adapters. Pass `domain.Manifest`
@@ -105,8 +106,30 @@ commands.
 
 Docker tests must create their own projects/networks and preserve other resources.
 Test systemd only in a disposable Ubuntu VM with `test/systemd/check.sh`, including
-reboot. Keep test infrastructure out of the runnable composer-example repository.
+reboot. Keep test infrastructure out of the runnable gitsail-example repository.
 
 See [architecture](docs/architecture.md) for dependency rules,
 [builds](docs/builds.md) for source builds, and [systemd](docs/systemd.md) for
 installation, and [Contributing](CONTRIBUTING.md#test-systemd-changes) for Ubuntu checks.
+
+## User documentation
+
+- Root `README.md` contains only the language selector. `README.en.md` and
+  `README.ru.md` are task indexes; keep them concise and link directly to the
+  relevant recipe or reference.
+- Put task-oriented guides in matching `docs/en/recipes/` and
+  `docs/ru/recipes/` paths. Put field and command lookups in matching
+  `docs/en/reference/` and `docs/ru/reference/` paths. Keep optional concepts
+  such as architecture separate from the task flow.
+- Use familiar product terms consistently: app / приложение, environment /
+  окружение, stage / stage, host configuration / конфигурация хоста, service /
+  сервис, volume / том. Keep identifiers, file names, command names, and YAML
+  keys unchanged in both languages.
+- Document only implemented behavior. Source code and the CLI are authoritative
+  for field names, defaults, command flags, merge rules, and template context.
+  Link to the app field reference when documenting Compose fields; the Compose
+  Specification is the authoritative complete list for `compose`.
+- Every recipe should state where to make the change, show a minimal working
+  example, and provide the command or next step. Keep English and Russian
+  examples behaviorally equivalent. Do not add tests for documentation-only
+  changes; check changed links and commands instead.

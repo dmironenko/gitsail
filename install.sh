@@ -2,7 +2,7 @@
 set -eu
 
 fail() {
-  printf 'composer: %s\n' "$*" >&2
+  printf 'gitsail: %s\n' "$*" >&2
   exit 1
 }
 
@@ -37,7 +37,7 @@ main() {
     /*) ;;
     *) install_dir="$(pwd)/$install_dir" ;;
   esac
-  target=$install_dir/composer
+  target=$install_dir/gitsail
   [ ! -d "$target" ] || fail "$target is a directory"
 
   work_dir=$(mktemp -d)
@@ -46,9 +46,9 @@ main() {
   trap 'exit 130' INT
   trap 'exit 143' TERM
 
-  archive=composer_${version}_${os}_${arch}.tar.gz
-  url=https://github.com/dmironenko/composer/releases/download/$version
-  printf 'Downloading Composer %s for %s/%s\n' "$version" "$os" "$arch"
+  archive=gitsail_${version}_${os}_${arch}.tar.gz
+  url=https://github.com/dmironenko/gitsail/releases/download/$version
+  printf 'Downloading GitSail %s for %s/%s\n' "$version" "$os" "$arch"
   curl -fsSL --proto '=https' "$url/$archive" -o "$work_dir/$archive"
   curl -fsSL --proto '=https' "$url/checksums.txt" -o "$work_dir/checksums.txt"
 
@@ -62,19 +62,19 @@ main() {
     fail 'install sha256sum or shasum to verify the download'
   fi
 
-  tar -xzf "$work_dir/$archive" -C "$work_dir" composer
-  [ -f "$work_dir/composer" ] && [ ! -L "$work_dir/composer" ] || fail 'archive must contain a regular composer binary'
-  [ "$("$work_dir/composer" --version)" = "composer version $version" ] || fail 'downloaded binary reports an unexpected version'
+  tar -xzf "$work_dir/$archive" -C "$work_dir" gitsail
+  [ -f "$work_dir/gitsail" ] && [ ! -L "$work_dir/gitsail" ] || fail 'archive must contain a regular gitsail binary'
+  [ "$("$work_dir/gitsail" --version)" = "gitsail version $version" ] || fail 'downloaded binary reports an unexpected version'
 
   mkdir -p "$install_dir"
-  staged=$(mktemp "$install_dir/.composer.XXXXXX")
-  install -m 755 "$work_dir/composer" "$staged"
+  staged=$(mktemp "$install_dir/.gitsail.XXXXXX")
+  install -m 755 "$work_dir/gitsail" "$staged"
   mv -f "$staged" "$target"
 
-  printf 'Installed Composer %s to %s\n' "$version" "$target"
+  printf 'Installed GitSail %s to %s\n' "$version" "$target"
   case ":$PATH:" in
     *":$install_dir:"*) ;;
-    *) printf 'Add %s to your PATH to run composer by name.\n' "$install_dir" ;;
+    *) printf 'Add %s to your PATH to run gitsail by name.\n' "$install_dir" ;;
   esac
 }
 

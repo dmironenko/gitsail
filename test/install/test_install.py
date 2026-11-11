@@ -16,7 +16,7 @@ VERSION = "v1.0.0"
 
 class InstallTest(unittest.TestCase):
     def setUp(self):
-        self.temp = tempfile.TemporaryDirectory(prefix="composer install ")
+        self.temp = tempfile.TemporaryDirectory(prefix="gitsail install ")
         self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name)
         self.assets = self.root / "assets"
@@ -25,7 +25,7 @@ class InstallTest(unittest.TestCase):
         self.tools.mkdir()
         self.destination = self.root / "bin with spaces"
         self.destination.mkdir()
-        self.binary = self.destination / "composer"
+        self.binary = self.destination / "gitsail"
         self.binary.write_bytes(b"previous installation")
         self.env = dict(os.environ, HOME=str(self.root), TMPDIR=str(self.root),
                         PATH=str(self.tools) + os.pathsep + os.environ["PATH"],
@@ -34,7 +34,7 @@ class InstallTest(unittest.TestCase):
         self.write_tool("curl", f"#!{sys.executable}\n" + '''import os, pathlib, shutil, sys
 args = sys.argv[1:]
 url = next(a for a in args if a.startswith("https://"))
-assert url.startswith("https://github.com/dmironenko/composer/releases/download/v1.0.0/")
+assert url.startswith("https://github.com/dmironenko/gitsail/releases/download/v1.0.0/")
 source = pathlib.Path(os.environ["TEST_ASSETS"]) / url.rsplit("/", 1)[1]
 if not source.is_file():
     sys.exit(22)
@@ -48,10 +48,10 @@ shutil.copyfile(source, args[args.index("-o") + 1])
         path.chmod(0o755)
 
     def make_archive(self, platform="linux_amd64", version=VERSION, symlink=False):
-        self.archive = self.assets / f"composer_{VERSION}_{platform}.tar.gz"
-        content = f"#!/bin/sh\nprintf 'composer version {version}\\n'\n".encode()
+        self.archive = self.assets / f"gitsail_{VERSION}_{platform}.tar.gz"
+        content = f"#!/bin/sh\nprintf 'gitsail version {version}\\n'\n".encode()
         with tarfile.open(self.archive, "w:gz") as archive:
-            entry = tarfile.TarInfo("composer")
+            entry = tarfile.TarInfo("gitsail")
             entry.mode = 0o755
             if symlink:
                 entry.type = tarfile.SYMTYPE
@@ -87,13 +87,13 @@ shutil.copyfile(source, args[args.index("-o") + 1])
                     self.assertEqual(result.returncode, 0, result.stderr)
                     self.assertEqual(old.read(), b"previous installation")
                 self.assertEqual(subprocess.check_output([str(self.binary), "--version"], text=True).strip(),
-                                 f"composer version {VERSION}")
+                                 f"gitsail version {VERSION}")
                 self.binary.write_bytes(b"previous installation")
 
     def test_default_user_directory(self):
         result = self.run_installer(VERSION)
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertTrue((self.root / ".local/bin/composer").is_file())
+        self.assertTrue((self.root / ".local/bin/gitsail").is_file())
         self.assertIn("PATH", result.stdout)
         self.assertEqual(self.binary.read_bytes(), b"previous installation")
 

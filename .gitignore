@@ -1,5 +1,5 @@
 /bin/
-/composer.local.yaml
+/gitsail.local.yaml
 *.test
 coverage.out
 .DS_Store

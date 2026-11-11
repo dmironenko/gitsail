@@ -1,0 +1,32 @@
+{{- $compose := .Vars.compose -}}
+{{- $networks := dict "default" (dict "external" true "name" .Runtime.NetworkName) -}}
+
+name: {{ quote .Runtime.ProjectName }}
+
+services:
+{{- range $name, $service := $compose.services }}
+  {{ quote $name }}:
+{{- $defaults := dict "restart" "always" -}}
+{{- if not (or (get $service "network_mode") (get $service "networks")) -}}
+{{- $defaults = merge $defaults (dict "networks" (dict "default" (dict))) -}}
+{{- end -}}
+{{- if not (get $service "logging") -}}
+{{- $defaults = merge $defaults (dict "logging" (dict "driver" "json-file" "options" (dict "max-size" "10m" "max-file" "3"))) -}}
+{{- end -}}
+{{- if and $.Runtime.Image (not (get $service "image")) -}}
+{{- $defaults = merge $defaults (dict "image" $.Runtime.Image "pull_policy" "never") -}}
+{{- end -}}
+{{- $service = merge $defaults $service }}
+
+{{ toYAML $service | indent 4 }}
+{{- end }}
+
+networks:
+{{ toYAML (merge $networks (get $compose "networks")) | indent 2 }}
+
+{{- range $name, $value := $compose }}
+{{- if and (ne $name "services") (ne $name "networks") (ne $name "name") (ne $name "x-gitsail") }}
+{{ quote $name }}:
+{{ toYAML $value | indent 2 }}
+{{- end }}
+{{- end }}

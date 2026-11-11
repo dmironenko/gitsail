@@ -1,4 +1,4 @@
-module github.com/dmironenko/composer/v2
+module github.com/dmironenko/gitsail
 
 go 1.26.8
 
