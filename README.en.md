@@ -26,6 +26,7 @@ Choose what you want to do. Each link opens the steps or field list for that tas
 - [CLI commands](docs/en/reference/cli.md)
 - [Fields available in templates](docs/en/reference/templates.md)
 
-[How GitSail works](docs/en/architecture.md)
+## Learn more
 
-[Contribute](CONTRIBUTING.md)
+- [How GitSail works](docs/en/architecture.md)
+- [Contribute](CONTRIBUTING.md)

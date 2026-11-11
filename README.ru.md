@@ -26,6 +26,7 @@
 - [Команды CLI](docs/ru/reference/cli.md)
 - [Поля, доступные в шаблонах](docs/ru/reference/templates.md)
 
-[Как устроен GitSail](docs/ru/architecture.md)
+## Дополнительно
 
-[Участие в разработке](CONTRIBUTING.md)
+- [Как устроен GitSail](docs/ru/architecture.md)
+- [Участие в разработке](CONTRIBUTING.md)
