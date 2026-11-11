@@ -1,5 +1,7 @@
 # GitSail
 
+![views](https://hits.sh/github.com/dmironenko/gitsail.svg?style=flat&label=views&color=007ec6)
+
 Выберите задачу. Ссылки ведут прямо к рецептам и справочникам.
 
 ## Установить и запустить

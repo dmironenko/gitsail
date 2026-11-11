@@ -1,5 +1,7 @@
 # GitSail
 
+![views](https://hits.sh/github.com/dmironenko/gitsail.svg?style=flat&label=views&color=007ec6)
+
 Choose what you want to do. Each link opens the steps or field list for that task.
 
 ## Install and start
